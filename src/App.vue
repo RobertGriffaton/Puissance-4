@@ -1,7 +1,7 @@
 <script setup>
 import { ref, reactive } from 'vue';
 
-let joueur = ref('chat');
+let joueur = ref('rouge');
 let gagnant = ref('');
 let positionPiece = ref(0);
 
@@ -37,7 +37,7 @@ function click_td(ligne, colonne) {
     return;
   }
 
-  joueur.value = joueur.value === 'chat' ? 'souris' : 'chat';
+  joueur.value = joueur.value === 'rouge' ? 'jaune' : 'rouge';
 }
 
 function verifier_gagner(j, ligne, colonne) {
@@ -74,22 +74,23 @@ function rejouer() {
       tableau[l][c] = '';
     }
   }
-  joueur.value = 'chat';
+  joueur.value = 'rouge';
   gagnant.value = '';
 }
 </script>
 
 <template>
   <div id="jeu">
-    <div id="joueur-chat" :class="{ joueur: true, actif: joueur === 'chat' }">
-      <h2>Chat</h2>
-      <img src="./assets/piece-chat.svg" />
+    <div id="joueur-rouge" :class="{ joueur: true, actif: joueur === 'rouge' }">
+      <h2>Rouge</h2>
+      <img src="./assets/piece-rouge.png" />
     </div>
 
     <img
       id="piece-active"
       :style="'left:' + positionPiece + 'px'"
-      :src="'/src/assets/piece-' + joueur + '.svg'"
+      :src="'/src/assets/piece-' + joueur + '.png'"
+      alt="Pièce active"
     />
 
     <table @mousemove="mouvement_tableau">
@@ -98,23 +99,24 @@ function rejouer() {
           <Transition name="trans-piece">
             <img
               v-if="tableau[ligne - 1][colonne - 1] !== ''"
-              :src="'/src/assets/piece-' + tableau[ligne - 1][colonne - 1] + '.svg'"
+              :src="'/src/assets/piece-' + tableau[ligne - 1][colonne - 1] + '.png'"
+              alt="Pièce"
             />
           </Transition>
         </td>
       </tr>
     </table>
 
-    <div id="joueur-souris" :class="{ joueur: true, actif: joueur === 'souris' }">
-      <h2>Souris</h2>
-      <img src="./assets/piece-souris.svg" />
+    <div id="joueur-jaune" :class="{ joueur: true, actif: joueur === 'jaune' }">
+      <h2>Jaune</h2>
+      <img src="./assets/piece-jaune.png" />
     </div>
   </div>
 
   <!-- Animation de victoire -->
   <Transition name="fade-slide">
     <div v-if="gagnant" class="popup">
-      <p>{{ gagnant }} a gagné !</p>
+      <p>Le joueur {{ gagnant }} a gagné !</p>
       <button @click="rejouer">Rejouer</button>
     </div>
   </Transition>
@@ -130,12 +132,19 @@ function rejouer() {
   display: flex;
   margin-top: 100px;
   justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+  position: relative;
 }
 
 #piece-active {
   position: absolute;
-  left: 100px;
   top: 20px;
+  left: 100px;
+  width: 50px;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
 }
 
 .joueur {
@@ -146,10 +155,13 @@ function rejouer() {
   background-color: blue;
   color: white;
   border-radius: 10px;
-  font-family: sans;
+  font-family: sans-serif;
   padding: 0.5em;
   text-align: center;
   box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .joueur.actif {
@@ -158,29 +170,43 @@ function rejouer() {
 
 .joueur h2 {
   font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.joueur img {
+  max-width: 80px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
 }
 
 table {
-  padding: 25px;
-  padding-top: 27px;
-  padding-bottom: 23px;
+  padding: 25px 25px 23px 25px;
   background-image: url(assets/cadre.svg);
   border-collapse: separate;
   border-spacing: 0;
+  user-select: none;
 }
 
 td {
   text-align: center;
   width: 68px;
   height: 68px;
+  cursor: pointer;
 }
 
 table img {
+  max-width: 68px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
   position: relative;
   transition: top 0.5s ease-in;
   top: 0;
   z-index: -1;
+  user-select: none;
 }
+
 
 #jeu tr:nth-child(1) .trans-piece-enter-from {
   top: -110px;
@@ -242,6 +268,7 @@ button:hover {
 .fade-slide-leave-active {
   animation: disappear 0.3s ease forwards;
 }
+
 @keyframes appear {
   0% {
     opacity: 0;
